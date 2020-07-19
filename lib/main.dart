@@ -50,6 +50,10 @@ class Searchpage extends StatelessWidget {
   Widget build(BuildContext context) {
     final weatherBloc = BlocProvider.of<WeatherBloc>(context);
     var cityController = TextEditingController();
+    final snackBar = SnackBar(
+      content: Text("Sorry, City name is invaild"),
+      duration: Duration(milliseconds: 1500),
+    );
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -73,6 +77,82 @@ class Searchpage extends StatelessWidget {
             );
           } else if (state is WeatherIsLoaded) {
             return ShowWeather(state.getWeather, cityController.text);
+          } else if (state is WeatherIsNotLoaded) {
+            WidgetsBinding.instance.addPostFrameCallback(
+                (_) => Scaffold.of(context).showSnackBar(snackBar));
+            return Container(
+                padding: EdgeInsets.only(left: 32, right: 32),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      "Search Weather",
+                      style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white70),
+                    ),
+                    Text(
+                      "city",
+                      style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.w200,
+                          color: Colors.white70),
+                    ),
+                    SizedBox(
+                      height: 24,
+                    ),
+                    TextFormField(
+                      controller: cityController,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.white70,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(
+                            color: Colors.white70,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          borderSide: BorderSide(
+                            color: Colors.blue,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        hintText: "City Name",
+                        hintStyle: TextStyle(
+                          color: Colors.white70,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: Colors.white70,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 50,
+                      child: FlatButton(
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        onPressed: () {
+                          weatherBloc.add(FetchWeather(cityController.text));
+                        },
+                        child: Text(
+                          "Search",
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                        ),
+                        color: Colors.lightBlue,
+                      ),
+                    ),
+                  ],
+                ));
           } else {
             return Container(
                 padding: EdgeInsets.only(left: 32, right: 32),
